@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>إلى ستيلا ❤️</title>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -42,24 +42,34 @@
         @keyframes scan { 0%, 100% { top: 10%; } 50% { top: 90%; } }
         #status-text { margin-top: 25px; color: rgba(255, 255, 255, 0.6); font-size: 20px; text-align: center; }
 
-        /* المربع الثابت (مستحيل يتحرك) */
+        /* المربع المحصن - Fixed & Rigid */
         .overlay { 
             position: absolute; z-index: 10;
             width: 340px !important; 
             height: 480px !important; 
-            padding: 30px; box-sizing: border-box;
-            border-radius: 35px; transition: background 0.5s, backdrop-filter 0.5s;
+            padding: 30px; 
+            box-sizing: border-box;
+            border-radius: 35px;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             overflow: hidden;
-            max-height: 480px !important; min-height: 480px !important;
+            /* تثبيت الطبقة برمجياً */
+            backface-visibility: hidden;
+            transform: translateZ(0); 
+            -webkit-font-smoothing: antialiased;
         }
 
         .glass-box {
             background: rgba(255, 255, 255, 0.08) !important; 
             backdrop-filter: blur(15px) !important; 
             -webkit-backdrop-filter: blur(15px) !important; 
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* حاوية النصوص تضمن عدم تحريك الأب (المربع) */
+        .content-container {
+            position: relative; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
 
         .poem { font-size: 26px; line-height: 1.8; display: none; opacity: 0; transition: 1s; width: 100%; text-align: center; }
@@ -75,7 +85,7 @@
         #msg { 
             font-size: 20px; line-height: 1.8; width: 100%; color: #fff; text-align: center;
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 85%;
+            width: 100%; pointer-events: none;
         }
     </style>
 </head>
@@ -94,21 +104,23 @@
     <audio id="mySong" loop><source src="https://files.catbox.moe/n5ghkh.mp3" type="audio/mpeg"></audio>
 
     <div class="overlay" id="mainOverlay">
-        <div class="poem" id="poem">
-            وَلَعَلّنَا مَن بَعدِ بُعدٍ نَلتَقِي<br>
-            وَيَطيَبُ قَلبي عِندَمَا أَلْقَاكِ<br>
-            فَمَا رأَيتُ أَعَزّمَنكِ فيِ قَلبي<br>
-            وَمَا رَغبتُ فيِ أَحَدٍ سِواَكِ
-        </div>
-
-        <div class="question-area" id="questionArea">
-            <h2 style="font-size: 28px; margin-bottom: 5px;">ستيلا تحبيني؟</h2>
-            <div class="btn-container">
-                <button id="yesBtn">أكييييد</button>
-                <button id="noBtn">لا</button>
+        <div class="content-container">
+            <div class="poem" id="poem">
+                وَلَعَلّنَا مَن بَعدِ بُعدٍ نَلتَقِي<br>
+                وَيَطيَبُ قَلبي عِندَمَا أَلْقَاكِ<br>
+                فَمَا رأَيتُ أَعَزّمَنكِ فيِ قَلبي<br>
+                وَمَا رَغبتُ فيِ أَحَدٍ سِواَكِ
             </div>
+
+            <div class="question-area" id="questionArea">
+                <h2 style="font-size: 28px; margin-bottom: 5px;">ستيلا تحبيني؟</h2>
+                <div class="btn-container">
+                    <button id="yesBtn">أكييييد</button>
+                    <button id="noBtn">لا</button>
+                </div>
+            </div>
+            <div id="msg" class="message"></div>
         </div>
-        <div id="msg" class="message"></div>
     </div>
 
 <script>
@@ -127,7 +139,7 @@
     fp.addEventListener('click', function() {
         document.getElementById('fp-svg').style.fill = "#4eff9b";
         st.innerText = "جاري مطابقة البصمة...";
-        setTimeout(() => { st.innerText = "أهلاً ستيلا، كنت بانتظارك"; }, 1500); // حذف القلب هنا
+        setTimeout(() => { st.innerText = "أهلاً ستيلا، كنت بانتظارك"; }, 1500);
         setTimeout(() => { 
             document.getElementById('mySong').play(); 
             welcome.style.opacity = '0';
@@ -172,7 +184,10 @@
                 let char = finalMsg.charAt(i); 
                 msgDiv.innerHTML += char === '\n' ? '<br>' : char; 
                 i++; 
-                setTimeout(type, 55); 
+                // تقليل الهزة عبر طلب إطار أنيميشن من المتصفح
+                requestAnimationFrame(() => {
+                    setTimeout(type, 50); 
+                });
             } 
         }
         setTimeout(type, 500);
