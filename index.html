@@ -22,8 +22,8 @@
             transition: background 2s ease-in-out;
         }
         
-        /* تم تغيير الرابط ليقرأ ملف الصورة بجانب ملف الـ HTML */
         body.bg-changed {
+            /* تأكد من رفع صورة باسم my-image.jpg بجانب ملف الـ html */
             background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('my-image.jpg') no-repeat center center fixed;
             background-size: cover;
         }
@@ -80,23 +80,23 @@
             50% { top: 85%; } 
         }
         
-        /* المربع الشفاف Glassmorphism */
+        /* المربع شفاف شبه معدوم */
         .overlay { 
             position: absolute; 
             z-index: 10; 
-            width: 85%; 
-            max-width: 450px; 
-            height: 55vh; 
-            padding: 25px; 
-            border-radius: 35px; 
+            width: 90%; 
+            max-width: 500px; 
+            height: 60vh; 
+            padding: 20px; 
+            border-radius: 40px; 
             display: none; 
             flex-direction: column; 
             align-items: center; 
             box-sizing: border-box; 
-            background: rgba(255, 255, 255, 0.04); 
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.01); 
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             opacity: 0;
             transition: opacity 2s ease, transform 2s ease;
             transform: translateY(30px);
@@ -105,29 +105,29 @@
         #lyricsContainer {
             width: 100%;
             height: 100%;
-            overflow-y: auto;
-            scrollbar-width: none;
-            direction: ltr;
-            mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
-        
-        #lyricsContainer::-webkit-scrollbar { display: none; }
         
         .lyric-line {
-            font-size: 24px;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.4);
-            margin: 45px 0;
-            opacity: 0;
-            transition: all 1.2s ease;
+            font-size: 22px;
+            line-height: 1.6;
+            color: white;
             text-align: center;
+            opacity: 0;
+            display: none;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            transform: translateY(10px);
+            text-shadow: 0 0 15px rgba(255,255,255,0.6);
         }
         
-        .lyric-line.show {
+        .lyric-line.active {
+            display: block;
             opacity: 1;
-            color: #ffffff;
-            transform: scale(1.1);
-            text-shadow: 0 0 20px rgba(255,255,255,0.4);
+            transform: translateY(0);
         }
     </style>
 </head>
@@ -143,8 +143,8 @@
         <p id="status-text">بصمة ستيلا مطلوبة</p>
     </div>
 
-    <audio id="mySong" loop>
-        <source src="https://files.catbox.moe/n5ghkh.mp3" type="audio/mpeg">
+    <audio id="mySong">
+        <source src="https://files.catbox.moe/64ad9y.mp3" type="audio/mpeg">
     </audio>
 
     <div class="overlay" id="lyricsOverlay">
@@ -153,22 +153,43 @@
 
     <script>
         const song = document.getElementById('mySong');
-        const lyrics = [
-            "The night we met...",
-            "I knew I needed you so",
-            "And if I had the chance",
-            "I'd never let you go",
-            "So won't you say you love me?",
-            "I'll make you so proud of me",
-            "We'll make 'em turn their heads",
-            "Every place we go",
-            "So won't you, please...",
-            "Be my, be my baby",
-            "Be my little baby",
-            "My one and only baby",
-            "Say you'll be my darlin'",
-            "Be my baby now"
+        
+        // كلمات الأغنية مع توقيت ظهورها بالثواني (مضبوطة مع اللحن)
+        const lyricsData = [
+            { time: 5.5, text: "The night we met, I knew I needed you so" },
+            { time: 10.5, text: "And if I had the chance, I'd never let you go" },
+            { time: 15.5, text: "So won't you say you love me?" },
+            { time: 19.5, text: "I'll make you so proud of me" },
+            { time: 24.5, text: "We'll make 'em turn their heads every place we go" },
+            { time: 29.5, text: "So won't you, please (be my, be my baby)" },
+            { time: 33.5, text: "Be my little baby? (My one, and only baby)" },
+            { time: 38.5, text: "Say you'll be my darlin' (be my, be my baby)" },
+            { time: 42.5, text: "Be my baby now (my one, and only baby)" },
+            { time: 47.0, text: "Whoa, oh, oh, oh" },
+            { time: 52.0, text: "I'll make you happy, baby, just wait and see" },
+            { time: 57.0, text: "For every kiss you give me, I'll give you three" },
+            { time: 61.5, text: "Oh, since the day I saw you" },
+            { time: 66.5, text: "I have been waiting for you" },
+            { time: 71.0, text: "You know, I will adore you 'til eternity" },
+            { time: 75.5, text: "So won't you, please (be my, be my baby)" },
+            { time: 79.5, text: "Be my little baby? (My one, and only baby)" },
+            { time: 84.5, text: "Say you'll be my darlin' (be my, be my baby)" },
+            { time: 88.5, text: "Be my baby now (my one, and only baby)" },
+            { time: 94.0, text: "Whoa, oh, oh, oh, oh" },
+            { time: 103.0, text: "So come on and be (be my, be my baby)" },
+            { time: 107.0, text: "Be my little baby (my one, and only baby)" },
+            { time: 112.0, text: "Say you'll be my darlin' (be my, be my baby)" },
+            { time: 116.5, text: "Be my baby now (my one, and only baby)" }
         ];
+
+        const container = document.getElementById('lyricsContainer');
+        lyricsData.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'lyric-line';
+            div.id = 'line-' + index;
+            div.textContent = item.text;
+            container.appendChild(div);
+        });
 
         document.getElementById('fingerprintContainer').onclick = function() {
             const status = document.getElementById('status-text');
@@ -184,46 +205,32 @@
                 
                 setTimeout(() => {
                     document.getElementById('welcomeScreen').style.opacity = '0';
-                    
                     setTimeout(() => {
                         document.getElementById('welcomeScreen').style.display = 'none';
                         document.body.classList.add('bg-changed');
                         
-                        // تأخير ظهور المربع (ثانيتين ونصف)
                         setTimeout(() => {
                             const lyricsBox = document.getElementById('lyricsOverlay');
                             lyricsBox.style.display = 'flex';
-                            
-                            setTimeout(() => {
-                                lyricsBox.style.opacity = '1';
-                                lyricsBox.style.transform = 'translateY(0)';
-                                startLyrics();
-                            }, 100);
-                        }, 2500); 
-                        
+                            setTimeout(() => { lyricsBox.style.opacity = '1'; }, 100);
+                        }, 1000);
                     }, 1000);
                 }, 1500);
             }, 1500);
         };
 
-        function startLyrics() {
-            const container = document.getElementById('lyricsContainer');
-            lyrics.forEach(line => {
-                const lineDiv = document.createElement('div');
-                lineDiv.className = 'lyric-line';
-                lineDiv.textContent = line;
-                container.appendChild(lineDiv);
+        // وظيفة مزامنة الكلمات مع وقت الأغنية
+        song.ontimeupdate = function() {
+            const currentTime = song.currentTime;
+            lyricsData.forEach((item, index) => {
+                const line = document.getElementById('line-' + index);
+                if (currentTime >= item.time && (index === lyricsData.length - 1 || currentTime < lyricsData[index + 1].time)) {
+                    // إخفاء الأسطر الأخرى وإظهار السطر الحالي فقط
+                    document.querySelectorAll('.lyric-line').forEach(el => el.classList.remove('active'));
+                    line.classList.add('active');
+                }
             });
-
-            const lines = document.querySelectorAll('.lyric-line');
-            lines.forEach((line, index) => {
-                setTimeout(() => {
-                    if (index > 0) lines[index-1].style.opacity = "0.2";
-                    line.classList.add('show');
-                    line.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, index * 3000); 
-            });
-        }
+        };
     </script>
 </body>
 </html>
